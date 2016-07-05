@@ -262,14 +262,16 @@ if not exist "%instdir%\mingw64\bin\cc.exe"        (
     )
 )
 ::--------------------------------------------------tools
+::add by whmiao don't download it will block
+::goto next_work
 ::::git
-if not exist "%download_dir%\PortableGit-1.8.3-preview20130601.7z"        (
-    echo.--------------------download git
-    %instdir%\msys\1.0\bin\wget.exe -O %download_dir%\PortableGit-1.8.3-preview20130601.7z -c  "http://msysgit.googlecode.com/files/PortableGit-1.8.3-preview20130601.7z"
+if not exist "%download_dir%\PortableGit-1.7.3.1-preview20101002.7z"        (
+   echo.--------------------download git
+   %instdir%\msys\1.0\bin\wget.exe -O %download_dir%\PortableGit-1.8.3-preview20130601.7z -c  "http://msysgit.googlecode.com/files/PortableGit-1.8.3-preview20130601.7z"
 )
 if not exist "%instdir%\opt\bin\git.exe"    (
     echo.--------------------install git
-    %tools_dir%\7za.exe -y x %download_dir%\PortableGit-1.8.3-preview20130601.7z -o%instdir%\opt
+    %tools_dir%\7za.exe -y x %download_dir%\PortableGit-1.7.3.1-preview20101002.7z -o%instdir%\opt
     del "%instdir%\opt\git-bash.bat"
     del "%instdir%\opt\git-cmd.bat"
     del "%instdir%\opt\ReleaseNotes.rtf"
@@ -290,27 +292,29 @@ if not exist "%instdir%\opt\bin\svn.exe"    (
     %instdir%\msys\1.0\bin\mv README.txt doc\svn-win32-1.8.3
     cd ..
 )
+
+next_work:
 ::::cmake
-if not exist "%download_dir%\cmake-2.8.11.1-win32-x86.zip"        (
+if not exist "%download_dir%\cmake-2.8.11.2-win32-x86.zip"        (
     echo.--------------------download cmake
-    %instdir%\msys\1.0\bin\wget.exe -O %download_dir%\cmake-2.8.11.1-win32-x86.zip -c  "http://www.cmake.org/files/v2.8/cmake-2.8.11.1-win32-x86.zip"
+    %instdir%\msys\1.0\bin\wget.exe -O %download_dir%\cmake-2.8.11.2-win32-x86.zip -c  "http://www.cmake.org/files/v2.8/cmake-2.8.11.2-win32-x86.zip"
 )
 if not exist "%instdir%\opt\bin\cmake.exe"    (
     echo.--------------------install cmake
-    %instdir%\msys\1.0\bin\unzip -n -d %instdir%\opt %download_dir%\cmake-2.8.11.1-win32-x86.zip
+    %instdir%\msys\1.0\bin\unzip -n -d %instdir%\opt %download_dir%\cmake-2.8.11.2-win32-x86.zip
     cd %instdir%\opt
-	%instdir%\msys\1.0\bin\cp -va cmake-2.8.11.1-win32-x86/* .
-	%instdir%\msys\1.0\bin\rm -r cmake-2.8.11.1-win32-x86
+	%instdir%\msys\1.0\bin\cp -va cmake-2.8.11.2-win32-x86/* .
+	%instdir%\msys\1.0\bin\rm -r cmake-2.8.11.2-win32-x86
     cd ..
 )
 ::::hg
-if not exist "%download_dir%\tortoisehg-2.4.1-hg-2.2.2-x86.msi"        (
+if not exist "%download_dir%\tortoisehg-2.6.1-hg-2.4.1-x86.msi"        (
     echo.--------------------download hg
-    %instdir%\msys\1.0\bin\wget.exe -O %download_dir%\tortoisehg-2.4.1-hg-2.2.2-x86.msi --no-check-certificate -c "https://bitbucket.org/tortoisehg/thg/downloads/tortoisehg-2.4.1-hg-2.2.2-x86.msi"
+    %instdir%\msys\1.0\bin\wget.exe -O %download_dir%\tortoisehg-2.6.1-hg-2.4.1-x86.msi --no-check-certificate -c "https://bitbucket.org/tortoisehg/thg/downloads/tortoisehg-2.6.1-hg-2.4.1-x86.msi"
 )
 if not exist "%instdir%\opt\TortoiseHg\hg.exe"    (
     echo.--------------------install hg
-    msiexec /a %download_dir%\tortoisehg-2.4.1-hg-2.2.2-x86.msi /qb TARGETDIR=%instdir%\opt\hg-temp
+    msiexec /a %download_dir%\tortoisehg-2.6.1-hg-2.4.1-x86.msi /qb TARGETDIR=%instdir%\opt\hg-temp
     cd %instdir%\opt
 	%instdir%\msys\1.0\bin\cp -va %instdir%\opt\hg-temp\PFiles\TortoiseHg %instdir%\opt
 	%instdir%\msys\1.0\bin\rm -r -f %instdir%\opt\hg-temp

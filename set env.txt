@@ -1,0 +1,1 @@
+source local32/etc/profile.local
