@@ -1,0 +1,134 @@
+#!/bin/bash
+
+#------------------------------------------------
+# start options
+#------------------------------------------------
+cpuCount=1          # cpuCount for complete
+remoteUpdate=0      # update source for git & hg
+build=0             # (configure) make
+rebuild=0           # clean & configure & make
+fullbuild=0         # delete & extract source & configure & make
+install=0           # (configure & make) make install
+reinstall=0         # (make clean & configure & make ) make install
+fullinstall=0       # delete & extract source & configure & make & make install
+package=all         # set target package (default all)
+step=0              # run script one by one
+
+while true; do
+  case $1 in
+--cpuCount=* ) cpuCount="${1#*=}"; shift ;;
+--update=* ) update="${1#*=}"; shift ;;
+--build=* ) build="${1#*=}"; shift ;;
+--rebuild=* ) rebuild="${1#*=}"; shift ;;
+--fullbuild=* ) fullbuild="${1#*=}"; shift ;;
+--install=* ) install="${1#*=}"; shift ;;
+--reinstall=* ) reinstall="${1#*=}"; shift ;;
+--fullinstall=* ) fullinstall="${1#*=}"; shift ;;
+--package=* ) package="${1#*=}"; shift ;;
+--step=* ) package="${1#*=}"; shift ;;
+    -- ) shift; break ;;
+    -* ) echo "Error, unknown option: '$1'."; exit 1 ;;
+    * ) break ;;
+  esac
+done
+
+is_erase=0                  # is remove source dir
+is_build=0                  # is build source
+is_install=0                # is install target
+is_clean=0                  # is clean old target
+
+if [ $fullbuild -eq 1 ]; then
+    is_erase=1
+fi
+if [ $rebuild -eq 1 ]; then
+    is_clean=1
+fi
+if [ $build -eq 1 ] || [ $rebuild -eq 1 ] || [ $fullbuild -eq 1 ]; then
+    is_build=1
+fi
+if [ $install -eq 1 ] || [ $reinstall -eq 1 ] || [ $fullinstall -eq 1 ]; then
+    is_install=1
+    is_build=1
+    if [ $rebuild -eq 0 ] && [ $fullbuild -eq 0 ]; then
+        build=1
+    fi
+fi
+
+current_dir=$(cd $(dirname $0); pwd)
+cd $current_dir
+
+package_dir=$current_dir/_install/package #download package directory
+
+targetHost="i686-w64-mingw32"
+if [[ $SYSBITS -eq 64 ]];then
+    targetHost="x86_64-pc-mingw32"
+fi
+
+echo ------------------------------------------[ config start ]
+echo -e "System bits    \t:$SYSBITS"
+echo -e "Target host    \t:$targetHost"
+echo -e "Build  path    \t:$BUILDDIR"
+echo -e "Global path    \t:$GLOBALDIR"
+echo -e "Local  path    \t:$LOCALDIR"
+echo -e "Erase  source  \t:$is_erase"
+echo -e "Build  source  \t:$is_build"
+echo -e "Install target \t:$is_install"
+echo ------------------------------------------[ config done. ]
+
+#------------------------------------------------
+# gitconfig
+#------------------------------------------------
+if [ ! -f ".gitconfig" ]; then
+    echo ----------update gitconfig no autocrlf
+    grep -q -e 'autocrlf' .gitconfig || cat > .gitconfig << "EOF"
+[core]
+	autocrlf = false
+EOF
+fi
+
+source $current_dir/_install/script/_global_func
+
+do_proc_start() {
+    cd $current_dir
+    local package_name="$1"
+    if [ $step = 1 ];then
+        echo --------------------------------------------!questing
+        echo -- press entry to build [ $package_name ] or other key skip or esc exit
+        echo --------------------------------------------!questing
+        if [ "$key" != "" ];then
+            echo "exit in 5s"
+            sleep 5
+            exit
+        fi
+        echo -e "continue\n"
+    fi
+
+    local func_exist=0
+    func_exists $2 && func_exist=1
+    if [ $func_exist -eq 0 ];then
+        source "./_install/script/$2"
+        func_exists $2 && func_exist=1
+    fi
+    echo ------------- [ $package_name start ] -------------
+    echo -ne "\033]0;Mingw$SYSBITS $package_name\007"
+    if [ $func_exist -eq 1 ];then
+        $2
+    else
+        echo ------------- $package_name function "$2" not found
+    fi
+    echo ------------- [ $package_name done. ] -------------
+}
+
+##global
+
+
+
+##audio
+
+
+
+##video
+
+#do_proc_start "x264.git" video_git_x264
+do_proc_start "x265.hg" video_hg_x265
+#do_proc_start "liblua" proc_liblua
