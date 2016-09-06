@@ -1,1 +1,3 @@
 source local32/etc/profile.local
+
+source local32/etc/profile.vs2013
